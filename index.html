@@ -56,7 +56,7 @@ function getData(selected_major) {
 	    var templateText = document.getElementById('tableTemplate').innerHTML;
 		var compiledTemplateText = Handlebars.compile(templateText);
 		compiledHtml = compiledTemplateText({ rows: major_items })
-		document.getElementById('majorTable').innerHTML = compiledHTML;
+		document.getElementById('majorTable').innerHTML = compiledHtml;
 	 }
 	 else {
 	    document.querySelector('#majorTable').innerHTML = "There was an error, or major not found.";
