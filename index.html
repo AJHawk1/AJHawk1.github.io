@@ -1,58 +1,70 @@
-<!DOCTYPE html>
-<html><head>  <meta charset="UTF-8">
-        <title>students</title>
+<!DOCTYPE html><html>
+<head>
+   
+   <meta charset="UTF-8">
+   
+   <title>Students By Major</title>
+   
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.1.2/handlebars.min.js"></script>
+   
 </head>
-<body style='margin-left: 30px;'>
+<body>
 
-    <h1>CIT7 Students</h1>
-    <p>CIT7 students: &nbsp;Exam 1 Scores</p>
-        
-    <input type="button" id='btn' value="Get Student Scores">
-             
- 	<div id="result"></div>
-
- 	<p> Example of the JSON data structure this Ajax request returns:&nbsp; an array of student objects.
-    <pre><strong>[
- {"name":"Alice","midterm":95,"final":97},
- {"name":"Bryan","midterm":68,"final":80}
-]
- 	</strong></pre></p>
-    
-<script>
+   <h1>Select a Major</h1>
    
-    document.addEventListener('DOMContentLoaded', function() {      // when page has loaded, more or less
-													  
-    	document.querySelector('#btn').onclick = function(){   // attach to button
-
-        	var request = new XMLHttpRequest();
-        	request.open('GET', 'exam_scores.json');
-
-        	request.onload = function(){
-
-            	var data = JSON.parse(request.responseText);
-			
-            	if (request.status == 200) {
-            		var contents = "<table cellspacing='5'><tr><td>Name</td><td>Midterm</td><td>Final</td></tr>"
-					
-            		for(i = 0; i < data.length; i++) {
-                     	contents += "<tr><td>" + data[i].name + "</td><td>" + data[i].midterm + "</td><td>" + data[i].final + "</td></tr>";
-                	}
-					
-                	contents += "</table>";
-                	document.querySelector('#result').innerHTML = contents;
-            	}
-            	else {
-                	document.querySelector('#result').innerHTML = "There was an error.";
-            	}
-        }
-
-        request.send(null);
-    };
-	
-  });
+   <div style='padding: 5px;'>
+      <button type='button' class="btn btn-primary" onClick="getData('CIT')">CIT Majors</button>
+	  <button type='button' class="btn btn-primary" onClick="getData('BUS')">Business Majors</button>
+   </div>
    
-</script>
+   <h2>We filter our dataset by major</h2>
    
+   <div id="majorTable"></div>
    
 </body>
+
+<!-- Handlebars template -->
+
+<script type="text/x-handlebars-template" id="tableTemplate">
+   <table cellspacing='12'>
+      <tr><th>Name</th><th>Major</th><th>Midterm</th><th>Final</th></tr>
+	     {{#each rows}}
+		    <tr>
+			   <td>{{name}}</td><td>{{major}}</td><td>{{midterm}}</td><td>{{final}}</td>
+			</tr>
+		 {{/each}}
+   </table>
+</script>
+
+<!-- Ajax code -->
+
+<script>
+
+function getData(selected_major) {
+   var request = new XMLHttpRequest();
+   request.open('GET', 'cit5students.json');
+   
+   request.onload = function() {
+      var data = JSON.parse(request.responseText);
+	  
+	  major_items = data.filter(getMajor)
+	  function getMajor(item) {
+	     return item.major == selected_major;
+	  }
+	  
+	 if (request.status == 200) {
+	    var templateText = document.getElementById('tableTemplate').innerHTML;
+		var compiledTemplateText = Handlebars.compile(templateText);
+		compiledHtml = compiledTemplateText({ rows: major_items })
+		document.getElementById('majorTable').innerHTML = compiledHTML;
+	 }
+	 else {
+	    document.querySelector('#majorTable').innerHTML = "There was an error, or major not found.";
+	 }
+   }
+   
+   request.send(null);
+  }
+  
+</script>
 </html>
